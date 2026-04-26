@@ -165,7 +165,11 @@ curl "http://localhost:8082/health"
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Testing
+
+Basic unit tests are implemented for the service layer to verify core functionality such as aggregation, deduplication, and error handling.
+
+### ▶️ Run All Tests
 
 ```bash
 go test ./...

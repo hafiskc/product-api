@@ -69,7 +69,7 @@ func (s *ProductService) Search(query string) model.SearchResponse {
 		return unique[i].Price < unique[j].Price
 	})
 
-	// ✅ SAVE HISTORY (this was missing)
+	// ✅ SAVE HISTORY TO DB
 	s.historyRepo.Save(model.SearchHistory{
 		ID:              uuid.New().String(),
 		Query:           query,
@@ -86,15 +86,21 @@ func (s *ProductService) Search(query string) model.SearchResponse {
 }
 func deduplicate(products []model.Product) []model.Product {
 
-	seen := make(map[string]bool)
-	var result []model.Product
+	resultMap := make(map[string]model.Product)
 
 	for _, p := range products {
 
-		if !seen[p.SKU] {
-			seen[p.SKU] = true
-			result = append(result, p)
+		existing, found := resultMap[p.SKU]
+
+		if !found || p.Price < existing.Price {
+			resultMap[p.SKU] = p
 		}
+	}
+
+	var result []model.Product
+
+	for _, v := range resultMap {
+		result = append(result, v)
 	}
 
 	return result
